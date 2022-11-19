@@ -1,36 +1,57 @@
--- Activity 4
+-- Salespeople schema examination
+SELECT * FROM salespeople;
 
---« Create a new table called customers_nyc that pulls all rows from the customers table where the customer lives in New York City in the state of New York. »
+-- Getting the usernames of female salespeople sorted by their hire_date values and set LIMIT as 10
+ SELECT username FROM salespeople
+ WHERE gender = 'Female'
+ ORDER BY hire_date
+ LIMIT 10;
 
-CREATE TABLE customers_nyc AS (
+-- Customers table examination
+SELECT * FROM customers;
+
+--« Write a query that pulls all emails for ZoomZoom customers in the state of Florida in alphabetical order. »
+SELECT email, "state" FROM customers
+WHERE "state"='FL'
+ORDER BY email;
+
+--« Write a query that pulls all the first names, last names and email details for ZoomZoom customers in New York City in the state of New York. They should be ordered alphabetically by the last name followed by the first name. »
+
+SELECT first_name,last_name, email FROM customers
+WHERE "state" ='NY'
+ORDER BY last_name,first_name;
+
+--« Write a query that returns all customers with a phone number ordered by the date the customer was added to the database. »
+
 SELECT * FROM customers
-WHERE "state"='NY'
-);
+WHERE phone IS NOT NULL
+ORDER BY date_added;
 
--- « Delete from the new table all customers in postal code 10014. Due to local laws, they will not be eligible for marketing. »
+-- Multple JOIN
+SELECT
+	customers.first_name,
+	customers.last_name,
+	customers.phone
+FROM
+	sales
+	JOIN customers ON customers.customer_id = sales.customer_id
+	JOIN products ON sales.product_id = products.product_id
+WHERE
+	products.product_type = 'automobile'
+	AND customers.phone IS NOT NULL;
 
-DELETE FROM customers_nyc
-WHERE postal_code='10014';
+-- NULLIF function
+SELECT
+	*
+FROM
+	customers
+WHERE title = 'Honorable';
 
--- Checking if deletion has passed
-SELECT * FROM customers_nyc
-WHERE postal_code='10014';
-
--- « Add a new text column called event. »
-
-ALTER TABLE customers_nyc
-ADD COLUMN event TEXT;
-
--- Checking if column creation is OK
-SELECT * FROM customers_nyc;
-
--- « Set the value of the event to thank-you party. »
-UPDATE customers_nyc
-SET EVENT = 'thank-you party';
-
-
--- Checking if update is done
-SELECT * FROM customers_nyc;
-
--- customers_nyc table deletion
-DROP TABLE customers_nyc;
+SELECT
+	customer_id,
+	NULLIF(title, 'Honorable') AS title,
+	first_name,
+	last_name
+FROM
+	customers
+ORDER BY 1;
