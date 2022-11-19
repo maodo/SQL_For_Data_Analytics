@@ -48,3 +48,20 @@ CASE
 	ELSE 0
 END AS high_savings
 FROM sales;
+
+-- Now let's put it together
+
+SELECT
+	customers.*,
+	products.*,
+	COALESCE(dealerships.dealership_id, - 1),
+	CASE WHEN sales_amount < 500 THEN
+		1
+	ELSE
+		0
+	END AS high_savings
+FROM
+	customers
+	JOIN sales ON customers.customer_id = sales.customer_id
+	JOIN products ON sales.product_id = products.product_id
+	LEFT JOIN dealerships ON dealerships.dealership_id = sales.dealership_id;
